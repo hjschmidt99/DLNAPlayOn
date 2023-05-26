@@ -1,4 +1,4 @@
-@set "youtube-dl_path="C:\Program Files\yt-dlp\yt-dlp.exe""
+@set "youtube-dl_path="D:\Programme\yt-dlp.exe""
 
 @echo off>nul
 setlocal enabledelayedexpansion
