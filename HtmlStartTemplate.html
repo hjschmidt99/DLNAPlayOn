@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+  <head>
+    <meta charset="utf-8">
+    <title>Page de démarrage</title>
+    <script>
+      selected = "";
+      selected_set = "";
+      upnp_hist = [];
+      displayed = false;
+      function new_socket() {
+        try {
+          socket = new WebSocket("ws://" + location.hostname + ":" + String(parseInt(location.port,10)+1) + "/start");
+        } catch(exception) {
+          window.alert("{#jmwebsocketfailure#}");
+        }
+        socket.onerror = function(event) {
+          window.location.reload(true);
+        }
+        socket.onmessage = function(event) {
+           if (event.data == "close") {
+            socket.onclose = function(event) {};
+            socket.close();
+            document.getElementById("table").innerHTML = "{#jmrenderersclosed#}";
+            document.getElementById("play").style.display = "none";
+            document.getElementById("reset").style.display = "none";
+            upnp_cancel();
+            document.getElementById("upnp_but").style.display = "none";
+          } else if (event.data == "redirect") {
+            window.location.replace("##CONTROL-URL##");
+          } else if (event.data == "upnp") {
+            document.getElementById("upnp_but").style.display = "block";
+          } else if (event.data == "end" && !displayed) {
+            displayed = true;
+            document.getElementById("Renderers").style.display = "table";
+          } else {
+            let data_list = event.data.split("&");
+            if (data_list.length >= 2) {
+              if (data_list[0] == "command=add") {
+                let data = [];
+                for (let i=1; i<data_list.length; i++) {
+                  let data_name_value = data_list[i].split("=");
+                  if (data_name_value.length == 2) {
+                    data.push([data_name_value[0], decodeURIComponent(data_name_value[1])]);
+                  }
+                }
+                if (data.length > 0) {add_renderer(data);}
+              } else if (data_list[0] == "command=sel") {
+                let data_name_value = data_list[1].split("=");
+                if (data_name_value.length == 2) {
+                  let data = [data_name_value[0], data_name_value[1]];
+                  sel_renderer(data);
+                }
+              } else if (data_list[0] == "command=show") {
+                let data = [];
+                for (let i=1; i<data_list.length; i++) {
+                  let data_name_value = data_list[i].split("=");
+                  if (data_name_value.length == 2) {
+                    data.push([data_name_value[0], decodeURIComponent(data_name_value[1])]);
+                  }
+                }
+                if (data.length > 0) {show_renderer(data);}
+              } else if (data_list[0] == "command=hide") {
+                let data_name_value = data_list[1].split("=");
+                if (data_name_value.length == 2) {
+                  let data = [data_name_value[0], data_name_value[1]];
+                  hide_renderer(data);
+                }
+              }
+            }
+          }
+        }
+        socket.onclose = socket.onerror;
+        window.onbeforeunload = function () {
+          upnp_cancel();
+          socket.onclose = function(event) {};
+          socket.close();
+        }
+      }
+      function select_renderer(renderer) {
+        if (selected != "") {document.getElementById("renderer_" + selected).style.color="rgb(225,225,225)";}
+        renderer.style.color = "rgb(200,250,240)";
+        selected = renderer.id.substring(9);
+        document.getElementById("Renderer").value = selected;
+      }
+      function add_renderer(data) {
+        let renderers = document.getElementById("Renderers");
+        let renderer_index = "";
+        let renderer_name = "";
+        let renderer_ip = "";
+        let renderer_icon = "";
+        let renderer_status = "False";
+        for (let data_item of data) {
+          if (data_item[0] == "index") {
+            renderer_index = data_item[1];
+          } else if (data_item[0] == "name") {
+            renderer_name = data_item[1];
+          } else if (data_item[0] == "ip") {
+            renderer_ip = data_item[1];
+          } else if (data_item[0] == "icon") {
+            renderer_icon = data_item[1];
+          } else if (data_item[0] == "status") {
+            renderer_status = data_item[1];
+          }
+        }
+        if (renderer_index != "") {
+          let n_row = renderers.tBodies[0].insertRow();
+          n_row.id = "renderer_" + renderer_index;
+          let n_cell = n_row.insertCell();
+          n_cell.id = "renderer_icon";
+          n_cell.innerHTML = "<img style='height:36px;width:auto;vertical-align:middle;' src='" + renderer_icon + "' alt=' '/>";
+          n_cell = n_row.insertCell();
+          n_cell.id = "renderer_name";
+          n_cell.innerHTML = renderer_name;
+          n_cell = n_row.insertCell();
+          n_cell.id = "renderer_ip";
+          n_cell.innerHTML = renderer_ip;
+          n_cell.style.fontSize="70%";
+          if (renderer_status == "True") {
+            n_row.style.display = "table-row";
+          } else {
+            n_row.style.display = "none";
+          }
+          n_row.onclick = function() {select_renderer(this);};
+        }
+      }
+      function sel_renderer(data) {
+        if (data[0] == "index") {
+          selected_set = data[1];
+          if (selected == "" && document.getElementById("renderer_" + selected_set).style.display != "none") {
+            selected = selected_set;
+            document.getElementById("renderer_" + selected).style.color = "rgb(200,250,240)";
+            document.getElementById("Renderer").value = selected;
+          }
+        }
+      }
+      function show_renderer(data) {
+        let renderer_index = "";
+        let renderer_icon = "";
+        for (let data_item of data) {
+          if (data_item[0] == "index") {
+            renderer_index = data_item[1];
+          } else if (data_item[0] == "icon") {
+            renderer_icon = data_item[1];
+          }
+        }
+        if (renderer_index != "") {
+          document.getElementById("renderer_" + renderer_index).style.display = "table-row";
+          if (renderer_icon != "") {document.getElementById("renderer_" + renderer_index).cells[0].getElementsByTagName("img").item(0).setAttribute("src", renderer_icon);}
+          if (selected == "" && selected_set == renderer_index) {
+            selected = selected_set;
+            document.getElementById("renderer_" + selected).style.color = "rgb(200,250,240)";
+            document.getElementById("Renderer").value = selected;
+          }
+        }
+      }
+      function hide_renderer(data) {
+        if (data[0] == "index") {
+          document.getElementById("renderer_" + data[1]).style.display = "none";
+          if (selected == data[1]) {
+            document.getElementById("renderer_" + selected).style.color="rgb(225,225,225)";
+            selected="";
+            document.getElementById("Renderer").value = selected;
+          }
+        }
+      }
+      function reset_button() {
+        if (selected != "") {document.getElementById("renderer_" + selected).style.color="rgb(225,225,225)";}
+        selected = "";
+        if (selected_set != "") {
+          if (document.getElementById("renderer_" + selected_set).style.display != "none") {
+            document.getElementById("renderer_" + selected_set).style.color="rgb(200,250,240)";
+            selected = selected_set;
+          }
+        }
+        document.getElementById("Renderer").value = selected;
+        document.getElementById("URL-").value = URL_set;
+        document.getElementById("StartFrom").value = StartFrom_set;
+      }
+      function play_button() {
+        let url_ok = true;
+        let url_lines = document.getElementById("URL-").value.split(/\r?\n/g);
+        document.getElementById("URL").value=url_lines[0];
+        if (!document.getElementById("URL").checkValidity()) {
+          url_ok = false;
+          window.alert("{#jmentervalidurl#}");
+        } else {
+          if (url_lines.length >= 2) {
+            document.getElementById("SUBURL").value=url_lines[1];
+            if (!document.getElementById("SUBURL").checkValidity()) {
+              url_ok = false;
+              window.alert("{#jmentervalidsuburl#}");
+            }
+         }
+        }
+        if (url_ok) {
+          if (selected == "") {
+            window.alert("{#jmselectrenderer#}");
+          } else {
+          document.getElementById("form").submit();
+          }
+        }
+      }
+      function get_elt (uri, elt) {
+        let data_list = uri.split("?");
+        if (data_list.length <= 1) {return "";}
+        data_list = data_list[1].split("&");
+        for (let i=0; i<data_list.length; i++) {
+          let data_name_value = data_list[i].split("=");
+          if (data_name_value.length == 2 && data_name_value[0].toLowerCase() == elt) {return decodeURIComponent(data_name_value[1]);}
+        }
+        return "";
+      }
+      function get_uuid (uri) {
+        return get_elt (uri, "uuid");
+      }
+      function get_id (uri) {
+        return get_elt (uri, "id");
+      }
+      function upnp_button() {
+        if (document.getElementById("upnp_content").contentWindow.location.toString().indexOf("upnp") == -1 || document.getElementById("upnp_content").contentWindow.location.toString().slice(-9) == "upnp.html") {document.getElementById("upnp_content").contentWindow.location = "##UPNP-URL##";}
+        document.getElementById("upnp_nav").style.display = "block";
+      }
+      function upnp_cancel() {
+        document.getElementById("upnp_nav").style.display = "none";
+      }
+      function upnp_back() {
+        if (window.getSelection) {window.getSelection().removeAllRanges();}
+        if (upnp_hist.length >= 2) {
+          document.getElementById("upnp_content").contentWindow.location = upnp_hist[upnp_hist.length - 2][0];
+        }
+      }
+      function upnp_validate() {
+        if (document.getElementById("upnp_content").contentWindow.document.getElementById("upnp_val").innerHTML == 1) {
+          let obj_uuid = get_uuid(document.getElementById("upnp_content").contentWindow.location.toString());
+          let obj_id = get_id(document.getElementById("upnp_content").contentWindow.location.toString());
+          if (obj_uuid != "" && obj_id !="") {
+            document.getElementById("URL-").value = "upnp://" + obj_uuid + "?" + obj_id;
+            upnp_cancel();
+          }
+        }
+      }
+      function open_link(uri) {
+        if (window.getSelection) {window.getSelection().removeAllRanges();}
+        document.getElementById("upnp_content").contentWindow.open_link_abs(uri);
+      }
+      function upnp_load() {
+        let page_ad = document.getElementById("upnp_content").contentWindow.location.toString();
+        if (page_ad == "about:blank") {return;}
+        for (let i=0; i<upnp_hist.length; i++) {
+          if (upnp_hist[i][0] == page_ad) {
+             upnp_hist = upnp_hist.splice(0, i);
+             break;
+          }
+        }
+        document.getElementById("upnp_loading").style.animationName = "";
+        document.getElementById("upnp_loading").style.color = "rgb(40,45,50)";
+        let upnp_content = document.getElementById("upnp_content").contentWindow.document
+        if (upnp_content.getElementById("upnp_val").innerHTML == "e") {
+          if (upnp_hist.length == 0) {
+            upnp_cancel();
+          } else {
+            document.getElementById("upnp_content").contentWindow.location = upnp_hist[upnp_hist.length - 1][0];
+          }
+          return;
+        }
+        upnp_hist.push([page_ad, upnp_content.getElementById("upnp_title").innerHTML]);
+        let bc = "";
+        for (let i=0; i<upnp_hist.length; i++) {
+          if (i == 0 && upnp_hist.length==1) {
+            bc = "<a class=\"refresh\" style=\"font-size:200%;line-height:100%;\" href=\"javascript:open_link('" + encodeURIComponent(upnp_hist[0][0]+ ";refresh") + "')\">&capand;</a>&nbsp;&sc;&nbsp;";
+          } else if (i == 0) {
+            bc = "<a style=\"font-size:200%;line-height:100%;\" href=\"javascript:open_link('" + encodeURIComponent(upnp_hist[0][0]) + "')\">&capand;</a>&nbsp;&sc;&nbsp;";
+          } else if (i < upnp_hist.length -1) {
+            bc = bc + "<a href=\"javascript:open_link('" + encodeURIComponent(upnp_hist[i][0]) + "')\">" + upnp_hist[i][1] + "</a>&nbsp;&sc;&nbsp;";
+          } else {
+            bc = bc + "<a class=\"refresh\" href=\"javascript:open_link('" + encodeURIComponent(upnp_hist[i][0].replace("?", ";refresh?")) + "')\">" + upnp_hist[i][1] + "</a>&nbsp;&sc;&nbsp;";
+          }
+        }
+        if (upnp_content.links.length == 0) {bc = bc.slice(0, -10);}
+        document.getElementById("upnp_bc").innerHTML = bc;
+        let but_val = document.getElementById("upnp_validate");
+        if (upnp_content.getElementById("upnp_val").innerHTML == "1") {
+          but_val.onclick = upnp_validate;
+          but_val.style.cursor = "pointer";
+          but_val.style.color = "rgb(200,250,240)";
+        } else {
+          but_val.onclick = function() {};
+          but_val.style.cursor = "default";
+          but_val.style.color = "rgb(5,60,50)";
+        }
+      }
+    </script>
+    <style type="text/css">
+      table {
+        border: 1px solid rgb(0,0,0);
+        border-collapse:collapse;
+        margin-left: 10px;
+        width: 85%;
+        table-layout:fixed;
+      }
+      td {
+        border-top: 1px solid rgb(20,20,20);
+        padding: 5px;
+        vertical-align:middle;
+        word-wrap:break-word;
+        height:20px;
+      }
+      td:hover {
+        cursor:pointer
+      }
+      input, textarea {
+        border: none;
+        background-color:rgb(30,30,35);
+        color:rgb(200,250,240);
+        margin-left:30px;
+        margin-top:10px;
+        vertical-align:middle;
+        word-wrap:break-word;
+        overflow-y:auto;
+      }
+      label {
+        vertical-align:middle;
+      }
+      button {
+        vertical-align:middle;
+        border:none;
+        padding-top:20px;
+        padding-bottom:20px;
+        margin-left:10%;
+        margin-right:10%;
+        width:250px;
+        font-size:100%;
+        font-weight:bold;
+        cursor:pointer;
+        display:##DISPLAY##;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        left: 0;
+        top: 80px;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgb(40,45,50);
+        background-color: rgba(40,45,50,0.97);
+      }
+      a {
+        color: rgb(225,225,225);
+        text-decoration: none;
+      }
+      a:hover {
+        color: rgb(200,250,240);
+        cursor: pointer;
+      }
+      .refresh {
+        cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" style="font-size:30px;font-weight:bold;"><text x="2" y="-4" fill="white" rotate="90">↻</text></svg>') 10 10, progress !important;
+      }
+      @keyframes rotating {
+        0% {transform:rotate(0deg);vertical-align:0px;margin-bottom:0px;}
+        25% {transform:rotate(90deg);vertical-align:-3px;margin-bottom:-3px;margin-left:2px;margin-right:-2px;}
+        50% {transform:rotate(180deg);vertical-align:-8px;margin-bottom:-8px;margin-left:2px;margin-right:-2px;}
+        75% {transform:rotate(270deg);vertical-align:-5px;margin-bottom:-5px;margin-left:-6px;margin-right:6px;}
+        100% {transform:rotate(360deg);vertical-align:0px;margin-bottom:0px;}
+      }
+    </style>
+  </head>
+  <body style="background-color:rgb(40,45,50);color:rgb(225,225,225);font-size:32px;">
+    <h1 style="line-height:20px;font-size:180%;">PlayOn&nbsp;&nbsp;&nbsp;&nbsp;{#jstart#}<br></h1>
+    <div id="upnp_nav" class="modal">
+      <span id="upnp_back" style="cursor:pointer;margin-left:10px;" onclick="upnp_back()">&larr;</span>&nbsp;&nbsp;<span id="upnp_validate" style="color:rgb(5,60,50);">&check;</span>&nbsp;&nbsp;<span id="upnp_cancel" style="cursor:pointer;color:rgb(250,220,200);" onclick="upnp_cancel()">&cross;</span>&nbsp;&nbsp;<div id="upnp_loading" style="color:rgb(40,45,50);animation-duration:1s;animation-iteration-count:infinite;animation-timing-function:linear;display:inline-block">&orarr;</div>&nbsp;&nbsp;<div id="upnp_bc" style="font-size:20px;display:inline-block"></div>
+      <iframe id="upnp_content" src="about:blank" title="navigation UPnP" style="border:none;width:100%;height:80%;" onload="upnp_load()"> </iframe>
+    </div>
+    <label for="URL-" style="display:##DISPLAY##;">URL :<span id="upnp_but" style="display:none;"><button style="margin-left:5px;margin-right:0px;width:60px;height:30px;padding-left:2px;padding-right:2px;padding-top:0px;padding-bottom:0px;font-size:40%;" onclick="upnp_button()">UPnP &gt;</button></span></label>
+    <textarea id="URL-" name="MediaSrc-" required style="height:110px;resize:none;display:##DISPLAY##; font-size:50%;width:80%">##URL##</textarea>
+    <br>
+    <form method="post" id="form" style="display:##DISPLAY##;">
+      <input type="URL" id="URL" name="MediaSrc" value="" style="display:none;" required>
+      <input type="URL" id="SUBURL" name="MediaSubSrc" value="" style="display:none;">
+      <br>
+      <label for="StartFrom">{#jplaybackposition#} :</label>
+      <input type="time" id="StartFrom" name="MediaStartFrom" step="1" value="0##STARTFROM##" style="height:50px;font-size:70%;">
+      <input type="hidden" id="Renderer" name="RendererInd" value="" required>
+    </form>
+    <button id="play" style="background-color:rgb(200,250,240);" onclick="play_button()">{#jgoplay#}</button>
+    <button id="reset" style="background-color:rgb(250,220,200);" onclick="reset_button()">{#jreset#}</button>
+    <br><br>
+    <table id="Renderers" style="display:none;">
+      <colgroup>
+      <col style="width:10%;">
+      <col style="width:65%;">
+      <col style="width:25%;">
+      </colgroup>
+      <thead>
+          <tr>
+              <th colspan="3" id="table">{#jrenderers#}</th>
+          </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <br>
+    <script>
+      new_socket();
+      URL_set = document.getElementById("URL-").value;
+      StartFrom_set = document.getElementById("StartFrom").value;
+    </script>
+  </body>
+</html>

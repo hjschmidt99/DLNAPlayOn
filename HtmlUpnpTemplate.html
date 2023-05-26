@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+  <head>
+    <meta charset="utf-8">
+    <title>Navigation UPnP</title>
+    <script>
+      page_loading = false;
+      function open_link_abs(uri) {
+        if (page_loading) {return;}
+        page_loading = true;
+        if (window.parent.window.getSelection) {window.parent.window.getSelection().removeAllRanges();}
+        window.parent.document.getElementById("upnp_loading").style.color = "rgb(225,225,225)";
+        window.parent.document.getElementById("upnp_loading").style.animationName = "rotating";
+        document.styleSheets[0].cssRules[1].style.color="rgb(225,225,225)";
+        document.styleSheets[0].cssRules[1].style.cursor="default";
+        let bc = "";
+        for (let i=0; i<window.parent.upnp_hist.length; i++) {
+          if (i==0) {
+            bc = "<span style='font-size:200%;line-height:100%;'>&capand;</span>&nbsp;&sc;&nbsp;";
+          } else {
+            bc = bc + "<span>" + window.parent.upnp_hist[i][1] + "</span>&nbsp;&sc;&nbsp;";
+          }
+        }
+        if (document.links.length == 0) {bc = bc.slice(0, -10);}
+        window.parent.document.getElementById("upnp_bc").innerHTML = bc;
+        window.location = uri;
+      }
+      function open_link(uri) {
+        let abs_uri = "";
+        if (uri.indexOf("uuid=") != -1) {
+          abs_uri = window.location.toString() + "?" + uri;
+        } else if (uri.indexOf("id=") == -1) {
+          abs_uri = uri;
+        } else {
+          abs_uri = window.location.toString().substring(0,window.location.toString().indexOf("&id=")) + "&" + uri;
+        }
+        open_link_abs(abs_uri);
+      }
+    </script>
+    <style type="text/css">
+      a {
+        color: rgb(225,225,225);
+        text-decoration: none;
+      }
+      a:hover {
+        color: rgb(200,250,240);
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body style="background-color:rgb(40,45,50,0);color:rgb(225,225,225);font-size:20px;line-height:10px;">
+    <p id="upnp_val" style="display:none;">##UPNP-VAL##</p>
+    <p id="upnp_title" style="display:none;">##UPNP-TITLE##</p>
+##UPNP-OBJ##
+  </body>
+</html>'

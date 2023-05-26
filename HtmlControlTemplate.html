@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="fr-FR">
+  <head>
+    <meta charset="utf-8">
+    <title>Page de contrôle</title>
+    <script>
+      function new_socket() {
+        try {
+          socket = new WebSocket("ws://" + location.hostname + ":" + String(parseInt(location.port,10)+1) + "/control");
+        } catch(exception) {
+          window.alert("{#jmwebsocketfailure#}");
+        }
+        socket.onerror = function(event) {
+          window.location.reload(true);
+        }
+        socket.onmessage = function(event) {
+          if (event.data == "close") {
+            socket.onclose = function(event) {};
+            socket.close();
+            document.getElementById("status").innerHTML = "{#jinterfaceclosed#}";
+            document.getElementById("play-pause").style.display = "none";
+            document.getElementById("stop").style.display = "none";
+            document.getElementById("mute").style.display = "none";
+            document.getElementById("volume").style.display = "none";
+            seekbar.style.display = "none";
+            seektarget.style.display = "none";
+            document.getElementById("seektarget").style.display = "none";
+          } else if (event.data == "redirect") {
+            document.getElementById("status").innerHTML = "{#jback#}";
+            window.location.replace("##START-URL##");
+          } else if (event.data == "initialisation") {
+            document.getElementById("status").innerHTML = "{#jinitialization#}";
+            document.getElementById("play-pause").innerHTML = "{#jplay#}";
+          } else if (event.data == "prêt") {
+            document.getElementById("status").innerHTML = "{#jready#}";
+          } else if (event.data == "prêt (lecture à partir du début)") {
+            document.getElementById("status").innerHTML = "{#jreadyfromstart#}";
+          } else if (event.data == "en cours...") {
+            document.getElementById("status").innerHTML = "{#jinprogress#}...";
+          } else if (event.data == "Lecture") {
+            document.getElementById("status").innerHTML = "{#jinplayback#}";
+            document.getElementById("play-pause").innerHTML = "{#jpause#}";
+          } else if (event.data == "Pause") {
+            document.getElementById("status").innerHTML = "{#jinpause#}";
+            document.getElementById("play-pause").innerHTML = "{#jplay#}";
+          } else if (event.data.substring(0,13) == "Showstartfrom") {
+            if (event.data.substring(14) == "true") {
+              startfrom.value = "0" + document.getElementById("position").innerHTML;
+              document.getElementById("lStartFrom").style.display = "inline-block";
+              startfrom.style.display = "inline-block";
+            } else {
+              startfrom.value = "0:00:00";
+              document.getElementById("lStartFrom").style.display = "none";
+              startfrom.style.display = "none";
+            }
+          } else if (event.data == "Arrêt") {
+            document.getElementById("status").innerHTML = "{#jinstop#}";
+            document.getElementById("play-pause").innerHTML = "{#jplay#}";
+          } else if (event.data.substring(0,8) == "Duration") {
+            duration = parseInt(event.data.substring(9),10);
+            let seekduration_d = new Date(duration*1000);
+            document.getElementById("seekduration").innerHTML = seekduration_d.toISOString().substr(12, 7);
+            if (duration != 0) {
+              if (document.getElementById("position").innerHTML !="-") {
+                let cur_pos = document.getElementById("position").innerHTML.split(":");
+                seekbar.value = Math.floor((parseInt(cur_pos[0],10)*3600 + parseInt(cur_pos[1],10)*60 + parseInt(cur_pos[2],10)) / duration * 10000);
+                seekposition.innerHTML = document.getElementById("position").innerHTML;
+              }
+              seekbar.style.display = "inline-block";
+              seektarget.style.display = "block";
+            } else {
+              seekbar.style.display = "none";
+              seektarget.style.display = "none";
+            }
+          } else if (event.data.substring(0,3) == "URL") {
+            document.getElementById("media_src").innerHTML = event.data.substring(4);
+          } else if (event.data.substring(0,8) == "Playlist") {
+            let pl = event.data.substring(9).split("\r\n");
+            if (pl[1] != "") {
+              if (playlist.options.length == 1) {
+                for (let i=1;i<pl.length;i++) {
+                  playlist.options.add(new Option(pl[i].replace(/ /g,"\xa0"), i.toString()));
+                }
+                playlist.style.display="inline-block";
+                document.getElementById("shuffle").style.display = "inline-block";
+              } else {
+                let ml = Math.min(pl.length, playlist.options.length)
+                for (let i=1;i<ml;i++) {
+                  if (playlist.options[i].label != pl[i].replace(/ /g,"\xa0")) {
+                    playlist.options[i].label = pl[i].replace(/ /g,"\xa0");
+                  }
+                }
+              }
+            }
+          } else if (event.data.substring(0,7) == "Current") {
+            playlist.selectedIndex = parseInt(event.data.substring(8),10);
+          } else if (event.data.substring(0,7) == "Shuffle") {
+              if (event.data.substring(8) == "true") {
+                document.getElementById("shuffle").style.backgroundColor = "rgb(200,250,240)";
+              } else {
+                document.getElementById("shuffle").style.backgroundColor = "";
+              }
+          } else if (event.data.substring(0,4) == "Mute") {
+              if (event.data.substring(5) == "none") {
+                document.getElementById("mute").style.display = "none";
+                document.getElementById("volume").style.display = "none";
+              } else if (document.getElementById("mute").style.display == "none") {
+                document.getElementById("mute").style.display = "inline-block";
+                document.getElementById("volume").style.display = "inline-block";
+              }
+              if (event.data.substring(5) == "true") {
+                document.getElementById("mute").innerHTML = "🔈 <strong style='visibility:visible;'>&setmn;</strong>";
+              } else {
+               document.getElementById("mute").innerHTML = "🔈 <strong style='visibility:hidden;'>&setmn;</strong>";
+              }
+          } else if (event.data.substring(0,6) == "Volume") {
+              document.getElementById("volume").value = parseInt(event.data.substring(7),10);
+          } else if (event.data != "close") {
+            document.getElementById("position").innerHTML = event.data;
+            if (duration != 0 && !seekongoing ) {
+              let cur_pos = event.data.split(":");
+              seekbar.value = Math.floor((parseInt(cur_pos[0],10)*3600 + parseInt(cur_pos[1],10)*60 + parseInt(cur_pos[2],10)) / duration * 10000);
+              seekposition.innerHTML = event.data;
+            }
+          }
+        }
+        socket.onclose = function(event) {
+          new_socket();
+        }
+        window.onbeforeunload = function () {
+          socket.onclose = function(event) {};
+          socket.close();
+        }
+      }
+      duration = 0;
+      seekongoing = false;
+      function play_pause_button() {
+        if (document.getElementById("status").innerHTML != "{#jinitialization#}") {
+          if (document.getElementById("status").innerHTML == "{#jinstop#}" && duration != 0) {socket.send("Seek:" + seekposition.innerHTML);}
+          socket.send(document.getElementById("play-pause").innerHTML=="{#jplay#}"?"Lecture":"Pause");
+        }
+      }
+      function stop_button() {
+        conf = window.confirm("{#jmstop#}");
+        if (conf) {socket.send('Arrêt');}
+      }
+      function jump() {
+        socket.send("Jump:" + playlist.selectedIndex.toString());
+      }
+      function shuffle_button() {
+        socket.send("Shuffle");
+      }
+      function mute_button() {
+        if (document.getElementById("mute").innerHTML.indexOf("hidden") > 0) {
+          socket.send("Mute:true");
+        } else {
+          socket.send("Mute:false");
+        }
+      }
+      function volume_range() {
+        socket.send("Volume:" + document.getElementById("volume").value.toString());
+      }
+    </script>
+  </head>
+  <body style="background-color:rgb(40,45,50);color:rgb(225,225,225);font-size:32px;">
+    <h1 style="line-height:20px;font-size:180%;">PlayOn&nbsp;&nbsp;&nbsp;&nbsp;{#jcontrol#}<br></h1>
+    <img id="renderer_icon" src="data:;base64,##RENDERERICON##" alt=" " style="height:36px;width:auto;vertical-align:middle;">
+    <span id="renderer_name" style="font-size:130%;">&nbsp;&nbsp;##RENDERERNAME##</span>
+    <br style="line-height:100px;">
+    <select id="playlist" onchange="jump()" style="background-color:rgb(40,45,50);color:rgb(225,225,225);font-size:50%;width:91%;display:none;">
+    <option value="0" disabled hidden>{#jplaylist#}</option>
+    </select>&nbsp;<button id="shuffle" style="border:none;vertical-align:middle;display:none;" onclick="shuffle_button()"><svg xmlns="http://www.w3.org/2000/svg" width="15px" height="23px" style="font-size:30px;font-weight:bold;"><text x="-5" y="21" >&nesear;</text></svg></button>
+    <p style="margin-bottom:0px;">{#jurl#} : </p>
+    <p id="media_src" style="margin-left:30px;margin-top:10px;font-size:50%;word-wrap:break-word;height:110px;width:90%;overflow-y:auto;white-space:pre-wrap;">##URL##</p>
+    <p style="line-height:60px;">{#jstatus#} :&nbsp;&nbsp;&nbsp;<span id="status" style="color:rgb(200,250,240);">{#jinitialization#}</span></p>
+    <p style="line-height:60px;">{#jplaybackposition#} :&nbsp;&nbsp;&nbsp;<span id="position" style="color:rgb(200,250,240);">-</span></p>
+    <br>
+    <button id="play-pause" style="background-color:rgb(200,250,240);border:none;padding-top:20px;padding-bottom:20px;margin-left:50px;margin-right:75px;width:200px;font-size:100%;font-weight:bold;cursor:pointer;" onclick="play_pause_button()">{#jplay#}</button>
+    <button id="stop" style="background-color:rgb(250,220,200);border:none;padding-top:20px;padding-bottom:20px;margin-left:75px;margin-right:150px;width:200px;font-size:100%;font-weight:bold;cursor:pointer;" onclick="stop_button()">{#jstop#}</button>
+    <span id="mute" style="color:red;word-spacing:-30px;cursor:pointer;display:none;" onclick="mute_button()">🔈 <strong style="visibility:hidden;">&setmn;</strong></span>&nbsp;<input type="range" min="0" max="100" value="100" id="volume" style="width:100px;cursor:pointer;display:none;" onchange="volume_range()">
+    <br>
+    <br>
+    <input type="range" min="0" max="10000" value="0" id="seekbar" style="margin-left:50px;margin-right:50px;width:80%;cursor:pointer;display:none;">
+    <p id="seektarget" style="margin-left:50px;font-size:75%;display:none;"> {#jtargetposition#} : <span id="seekposition">0:00:00</span> / <span id="seekduration">0:00:00</span></p>
+    <label for="StartFrom" id="lStartFrom" style="margin-left:50px;font-size:75%;display:none;">{#jtargetposition#} :</label>
+    <input type="time" id="StartFrom" step="1" value="00:00:00" style="height:40px;font-size:70%;border: none;background-color:rgb(30,30,35);color:rgb(200,250,240);display:none;">
+    <script>
+      new_socket();
+      seekbar = document.getElementById("seekbar");
+      seekposition = document.getElementById("seekposition");
+      seekbar.onmousedown = function() {seekongoing = true;};
+      seekbar.onmouseup = function() {seekongoing = false;};
+      seekbar.ontouchstart = function() {seekongoing = true;};
+      seekbar.ontouchend = function() {seekongoing = false;};
+      seekbar.oninput = function() {
+        let seekposition_d = new Date(seekbar.value*duration/10);
+        seekposition.innerHTML = seekposition_d.toISOString().substr(12, 7);
+      }
+      seekbar.onchange = function() {
+        if (document.getElementById("status").innerHTML != "initialisation") {socket.send("Seek:" + seekposition.innerHTML);}
+        seekbar.blur();
+      }
+      playlist = document.getElementById("playlist");
+      playlist.selectedIndex = 0;
+      startfrom = document.getElementById("StartFrom");
+      startfrom.onchange = function() {
+        startfrom.onblur = function() {};
+        startfrom.blur();
+        if (startfrom.value.substring(1) != document.getElementById("position").innerHTML) {
+          socket.send("Seek:" + startfrom.value.substring(1));
+          jump();
+        }
+      }
+      startfrom.onblur = function() {
+        if (startfrom.value.substring(1) != document.getElementById("position").innerHTML) {
+          socket.send("Seek:" + startfrom.value.substring(1));
+          jump();
+        }
+      }
+      startfrom.onkeydown = function(k) {
+        startfrom.onchange = function() {};
+        if (k.keyCode == 13) {startfrom.blur();}
+      }
+    </script>
+  </body>
+</html>
