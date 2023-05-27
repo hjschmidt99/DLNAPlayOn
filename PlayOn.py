@@ -5147,7 +5147,7 @@ class DLNAWebInterfaceServer:
   
   HTML_UPNP_TEMPLATE = readFile("HtmlUpnpTemplate.html")
   HTML_START_TEMPLATE = readFile("HtmlStartTemplate.html")
-  #HTML_START_TEMPLATE = HTML_START_TEMPLATE.replace('{', '{{').replace('}', '}}').replace('{{#', '{').replace('#}}', '}').format_map(LSTRINGS['webinterface']).replace('{{', '{').replace('}}', '}')
+  HTML_START_TEMPLATE = HTML_START_TEMPLATE.replace('{', '{{').replace('}', '}}').replace('{{#', '{').replace('#}}', '}').format_map(LSTRINGS['webinterface']).replace('{{', '{').replace('}}', '}')
   HTML_CONTROL_TEMPLATE = readFile("HtmlControlTemplate.html")
   HTML_CONTROL_TEMPLATE = HTML_CONTROL_TEMPLATE.replace('{', '{{').replace('}', '}}').replace('{{#', '{').replace('#}}', '}').format_map(LSTRINGS['webinterface']).replace('{{', '{').replace('}}', '}')
 
