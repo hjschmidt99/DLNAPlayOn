@@ -32,224 +32,6 @@ import random
 import locale
 import ctypes, ctypes.wintypes
 
-FR_STRINGS = {
-  'mediaprovider': {
-    'opening': 'Ouverture de "%s" reconnu comme "%s" en mode "%s" - titre: %s',
-    'extension': 'Extension de "%s" retenue comme "%s"',
-    'failure': 'Échec de l\'ouverture de "%s" en tant que "%s"',
-    'subopening': 'Ouverture des sous-titres "%s" reconnus comme "%s"',
-    'subextension': 'Extension des sous_titres retenue comme "%s"',
-    'subfailure': 'Échec de l\'ouverture des sous-titres "%s" en tant que "%s"',
-    'contentpath': 'chemin d\'accès de contenu',
-    'contenturl': 'url de contenu',
-    'webpageurl': 'url de page web',
-    'loadstart': 'Début du chargement dans le tampon du contenu',
-    'segmentbuffering': 'Segment %d -> placement dans la zone %d du tampon',
-    'segmentfailure': 'Segment %d -> échec de lecture du contenu',
-    'loadstop': 'Fin du chargement dans le tampon du contenu',
-    'loadinterrupt': 'Interruption du chargement dans le tampon du contenu',
-    'connection': 'Connexion pour diffusion de "%s": persistente = %s - requêtes partielles = %s',
-    'yes': 'oui',
-    'no': 'non',
-    'indexation': 'Indexation du tampon sur la connexion %d',
-    'deindexation': 'Désindexation du tampon',
-    'translation': 'Translation du tampon vers la position %d',
-    'present': 'Segment %d -> déjà présent dans la zone %d du tampon'
-  },
-  'mediaserver': {
-    'connection': 'Connexion au serveur de diffusion de %s:%s',
-    'deliverystart': 'Connexion %d -> début de la distribution du contenu à %s:%s',
-    'delivery1': 'Connexion %d -> segment %d -> distribution à partir de la zone %d du tampon',
-    'delivery2': 'Connexion %d -> segment %d -> distribution',
-    'delivery3': 'Connexion %d -> segment %d -> distribution à partir du tampon',
-    'exceeded': 'Connexion %d -> segment %d -> la zone %d a été dépassée par la queue du tampon',
-    'expulsion': 'Connexion %d -> segment %d -> expulsion du tampon',
-    'failure': 'Connexion %d -> segment %d -> échec de distribution du contenu',
-    'deliveryfailure': 'Connexion %d -> échec de distribution du contenu',
-    'deliverystop': 'Connexion %d -> fin de la distribution du contenu',
-    'subdelivery': 'Distribution des sous-titres à %s:%s',
-    'subfailure': 'Échec de distribution des sous-titres à %s:%s',
-    'start': 'Démarrage, sur l\'interface %s, du serveur de diffusion en mode %s%s',
-    'sequential': 'séquentiel',
-    'random': 'aléatoire',
-    'unsupported': ' non supporté par la source',
-    'shutdown': 'Fermeture du serveur de diffusion'
-  },
-  'dlnanotification': {
-    'start': 'Démarrage du serveur d\'écoute des notifications d\'événement de %s DLNA à l\'adresse %s:%s',
-    'stop': 'Arrêt du serveur d\'écoute des notifications d\'événement de %s DLNA à l\'adresse %s:%s',
-    'alreadyactivated': 'Serveur d\'écoute des notifications d\'événement de %s DLNA à l\'adresse %s:%s déjà activée',
-    'receipt': 'DLNA Renderer %s -> service %s -> réception de la notification d\'événement %s',
-    'notification': 'DLNA Renderer %s -> Service %s -> notification d\'événement %s -> %s est passé à %s',
-    'alert': 'DLNA Renderer %s -> Service %s -> notification d\'événement %s -> alerte: %s est passé à %s'
-  },
-  'dlnaadvertisement': {
-    'receipt': 'Réception, sur l\'interface %s, d\'une publicité du périphérique %s (%s:%s): %s',
-    'ignored': 'Publicité du périphérique %s (%s:%s) ignorée en raison de la discordance d\'adresse de l\'URL de description',
-    'set': 'Mise en place de l\'écoute des publicités de périphérique DLNA sur l\'interface %s',
-    'fail': 'Échec de la mise en place de l\'écoute des publicités de périphérique DLNA sur l\'interface %s',
-    'alreadyactivated': 'Écoute des publicités de périphérique DLNA déjà activée',
-    'start': 'Démarrage du serveur d\'écoute des publicités de périphérique DLNA',
-    'stop': 'Arrêt du serveur d\'écoute des publicités de périphérique DLNA'
-  },
-  'dlnahandler': {
-    'ip_failure': 'Échec de la récupération de l\'adresse ip de l\'hôte',
-    'registering': 'Enregistrement du %s %s sur l\'interface %s',
-    'msearch1': 'Envoi d\'un message de recherche de uuid:%s',
-    'msearch2': 'Envoi d\'un message de recherche de périphérique DLNA',
-    'msearch3': 'Envoi d\'un message de recherche de %s DLNA',
-    'sent': 'Envoi du message de recherche sur l\'interface %s',
-    'fail': 'Échec de l\'envoi du message de recherche sur l\'interface %s',
-    'receipt': 'Réception, sur l\'interface %s, d\'une réponse au message de recherche de %s:%s',
-    'ignored': 'Réponse de %s:%s ignorée en raison de la discordance d\'adresse de l\'URL de description',
-    'alreadyactivated': 'Recherche de %s DLNA déjà activée',
-    'start': 'Démarrage de la recherche de %s DLNA',
-    'stop': 'Fin de la recherche de %s DLNA',
-    'commandabandonment': '%s %s -> service %s -> abandon de l\'envoi de la commande %s',
-    'commandsending': '%s %s -> service %s -> envoi de la commande %s',
-    'commandfailure': '%s %s -> service %s -> échec de l\'envoi de la commande %s',
-    'commandsuccess': '%s %s -> service %s -> succès de l\'envoi de la commande %s',
-    'responsefailure': '%s %s -> service %s -> échec du traitement de la réponse à la commande %s',
-    'responsesuccess': '%s %s -> service %s -> succès de la réception de la réponse à la commande %s',
-    'advertalreadyactivated': 'Écoute des publicités de %s déjà activée',
-    'advertstart': 'Démarrage de l\'écoute des publicités de %s',
-    'advertstop': 'Fin de l\'écoute des publicités de %s',
-    'subscralreadyactivated': 'Renderer %s -> service %s -> souscription au serveur d\'événements déjà en place',
-    'subscrfailure': 'Renderer %s -> service %s -> échec de la demande de souscription au serveur d\'événements',
-    'subscrsuccess': 'Renderer %s -> service %s -> souscription au serveur d\'événements sous le SID %s pour une durée de %s',
-    'subscrrenewfailure': 'Renderer %s -> service %s -> échec de la demande de renouvellement de souscription de SID %s au serveur d\'événements',
-    'subscrrenewsuccess': 'Renderer %s -> service %s -> renouvellement de la souscription de SID %s au serveur d\'événements pour une durée de %s',
-    'subscrunsubscrfailure': 'Renderer %s -> service %s -> échec de la demande de fin de souscription de SID %s au serveur d\'événements',
-    'subscrunsubscrsuccess': 'Renderer %s -> service %s -> fin de la souscription de SID %s au serveur d\'événements'
-  },
-  'websocket': {
-    'endacksuccess': 'WebSocket serveur %s:%s/%s -> WebSocket %s:%s -> succès de l\'envoi de l\'accusé de réception de l\'avis de fin de connexion',
-    'endackfailure': 'WebSocket serveur %s:%s/%s -> WebSocket %s:%s -> échec de l\'envoi de l\'accusé de réception de l\'avis de fin de connexion',
-    'errorendnotification': 'WebSocket serveur %s:%s/%s -> WebSocket %s:%s -> envoi d\'avis de fin de connexion pour cause d\'erreur %s',
-    'errorendnotificationsuccess': 'WebSocket serveur %s:%s/%s -> WebSocket %s:%s -> succès de l\'envoi de l\'avis de fin de connexion',
-    'errorendnotificationfailure': 'WebSocket serveur %s:%s/%s -> WebSocket %s:%s -> échec de l\'envoi de l\'avis de fin de connexion',
-    'terminationdatasuccess': 'WebSocket serveur %s:%s/%s -> WebSocket %s:%s -> succès de l\'envoi de la donnée de terminaison %s',
-    'terminationdatafailure': 'WebSocket serveur %s:%s/%s -> WebSocket %s:%s -> échec de l\'envoi de la donnée de terminaison %s',
-    'endnotificationsuccess': 'WebSocket serveur %s:%s/%s -> WebSocket %s:%s -> succès de l\'envoi de l\'avis de fin de connexion',
-    'endnotificationfailure': 'WebSocket serveur %s:%s/%s -> WebSocket %s:%s -> échec de l\'envoi de l\'avis de fin de connexion',
-    'datasuccess': 'WebSocket serveur %s:%s/%s -> WebSocket %s:%s -> envoi de la donnée %s',
-    'datafailure': 'WebSocket serveur %s:%s/%s -> WebSocket %s:%s -> échec de l\'envoi de la donnée %s',
-    'datareceipt': 'WebSocket serveur %s:%s/%s -> WebSocket %s:%s -> réception de la donnée %s',
-    'connectionrequest': 'WebSocket serveur %s:%s -> demande de connexion du WebSocket %s:%s',
-    'connectionrequestinvalid': 'WebSocket serveur %s:%s -> demande de connexion du WebSocket %s:%s invalide',
-    'connectionrequestnotfound': 'WebSocket serveur %s:%s -> chemin de demande de connexion du WebSocket %s:%s introuvable: /%s',
-    'connectionresponsefailure': 'WebSocket serveur %s:%s/%s -> échec de l\'envoi de la réponse à la demande de connexion du WebSocket %s:%s',
-    'connection': 'WebSocket serveur %s:%s/%s -> connexion au WebSocket %s:%s',
-    'endack': 'WebSocket serveur %s:%s/%s -> accusé de réception de fin de connexion du WebSocket %s:%s',
-    'endnotification': 'WebSocket serveur %s:%s/%s -> avis de fin de connexion du WebSocket %s:%s',
-    'connectionend': 'WebSocket serveur %s:%s/%s -> fin de connexion au WebSocket %s:%s',
-    'start': 'Démarrage du serveur pour Websocket à l\'adresse %s:%s',
-    'fail': 'Échec du démarrage du serveur pour Websocket à l\'adresse %s:%s',
-    'open': 'Websocket serveur %s:%s: ouverture du canal /%s',
-    'close': 'Websocket serveur %s:%s: fermeture du canal /%s',
-    'shutdown': 'Fermeture du serveur pour Websocket à l\'adresse %s:%s'
-  },
-  'webinterface': {
-    'ip_failure': 'Échec de la récupération de l\'adresse ip de l\'hôte',
-    'connection': 'Connexion de l\'interface web %s:%s',
-    'response': 'Réponse à l\'interface Web %s:%s - requête: %s',
-    'formdatareceipt': 'Réception de la donnée de formulaire %s de %s:%s',
-    'formdatareject': 'Rejet de la donnée de formulaire %s de %s:%s',
-    'playbackaccept': 'Prise en compte de la demande de lecture de %s%s à partir de %s sur %s de %s:%s',
-    'playbacksub': ' et %s',
-    'playbackreject': 'Rejet de la demande de lecture de %s%s à partir de %s sur %s de %s:%s',
-    'rendererstart': 'Démarrage du gestionnaire d\'affichage de renderer pour serveur d\'interface Web',
-    'launchrendererstart': 'Démarrage du gestionnaire d\'affichage de renderer dans le formulaire de lancement pour serveur d\'interface Web',
-    'rendererstop': 'Arrêt du gestionnaire d\'affichage de renderer pour serveur d\'interface Web',
-    'controlstart': 'Démarrage du gestionnaire de contrôleur de lecture pour serveur d\'interface Web',
-    'controlinterrupt': 'Interruption du gestionnaire de contrôleur de lecture pour serveur d\'interface Web',
-    'controlrenderer': 'Sélection du renderer %s sur l\'interface %s',
-    'playlist': 'Liste de lecture générée depuis l\'adresse %s: %s contenus média',
-    'nocontent': 'Absence de contenu média sous l\'adresse %s',
-    'nonegapless': 'Absence de support de la lecture sans blanc par le renderer %s',
-    'gapless': 'Lecture sans blanc des contenus média depuis l\'adresse %s activée',
-    'nogapless': 'Adresse %s incompatible avec la lecture sans blanc',
-    'norendereranswer': 'Absence de réponse du renderer %s',
-    'ready': 'Prêt pour lecture de "%s"%s, par %s, sur le renderer "%s"',
-    'subtitled': ', sous-titrée',
-    'direct': 'transmission directe de l\'adresse',
-    'random': 'diffusion via serveur en mode accès aléatoire',
-    'sequential': 'diffusion via serveur en mode accès séquentiel%s',
-    'remuxed': ', remuxé en %s',
-    'controlstop': 'Arrêt du gestionnaire de contrôleur de lecture pour serveur d\'interface Web%s%s%s%s',
-    'status': ' - statut ',
-    'start': 'Démarrage du serveur d\'interface Web sur l\'interface %s',
-    'alreadyrunning': 'Serveur d\'interface Web déjà en place',
-    'fail': 'Échec du démarrage du serveur d\'interface Web sur l\'interface %s',
-    'shutdown': 'Fermeture du serveur d\'interface Web',
-    'jstart': 'Interface de démarrage',
-    'jcontrol': 'Interface de contrôle',
-    'jrenderers': 'Renderers',
-    'jmwebsocketfailure': 'Échec de l\'établissement de la connexion WebSocket',
-    'jmrenderersclosed': 'Renderers - interface close',
-    'jmentervalidurl': 'Saisissez une URL de contenu média valide',
-    'jmentervalidsuburl': 'Saisissez une URL de sous-titres valide',
-    'jmselectrenderer': 'Sélectionnez d\'abord un renderer',
-    'jplaybackposition': 'Position de lecture',
-    'jgoplay': 'Lire',
-    'jreset': 'Réinitialiser',
-    'jplay': 'Lecture',
-    'jpause': 'Pause',
-    'jstop': 'Arrêt',
-    'jinterfaceclosed': 'interface close',
-    'jback': 'retour',
-    'jinitialization': 'initialisation',
-    'jready': 'prêt',
-    'jreadyfromstart': 'prêt (lecture à partir du début)',
-    'jinprogress': 'en cours',
-    'jinplayback': 'lecture',
-    'jinpause': 'pause',
-    'jinstop': 'arrêt',
-    'jplaylist': 'Liste de lecture',
-    'jurl': 'URL du média',
-    'jstatus': 'Statut',
-    'jtargetposition': 'Position cible',
-    'jmstop': 'Arrêter la lecture ?'
-  },
-  'parser': {
-    'license': 'Ce programme est sous licence copyleft GNU GPLv3 (voir https://www.gnu.org/licenses)',
-    'help': 'affichage du message d\'aide et interruption du script',
-    'ip': 'adresse IP de l\'interface web [auto-sélectionnée par défaut - "0.0.0.0", soit toutes les interfaces, si option présente sans mention d\'adresse]',
-    'port': 'port TCP de l\'interface web [8000 par défaut]',
-    'hip': 'adresse IP du contrôleur/client DLNA [auto-sélectionnée par défaut - "0.0.0.0", soit toutes les interfaces, si option présente sans mention d\'adresse]',
-    'rendereruuid': 'uuid du renderer [premier renderer sans sélection sur l\'uuid par défaut]',
-    'renderername': 'nom du renderer [premier renderer sans sélection sur le nom par défaut]',
-    'servertype': 'type de serveur (a:auto, s:séquentiel, r:aléatoire, g:sans-blanc/aléatoire, n:aucun) [a par défaut]',
-    'buffersize': 'taille du tampon en blocs de 1 Mo [75 par défaut]',
-    'bufferahead': 'taille du sous-tampon de chargement par anticipation en blocs de 1 Mo [25 par défaut]',
-    'muxcontainer': 'type de conteneur de remuxage précédé de ! pour qu\'il soit systématique [MP4 par défaut]',
-    'onreadyplay': 'lecture directe dès que le contenu média et le renderer sont prêts [désactivé par défaut]',
-    'displayrenderers': 'Affiche les renderers présents sur le réseau',
-    'start': 'Démarre l\'interface à partir de la page de lancement',
-    'control': 'Démarre l\'interface à partir de la page de contrôle',
-    'mediasrc1': 'adresse du contenu multimédia [aucune par défaut]',
-    'mediasrc2': 'adresse du contenu multimédia',
-    'mediasubsrc': 'adresse du contenu de sous-titres [aucun par défaut]',
-    'mediasublang': 'langue de sous-titres, . pour pas de sélection [fr,fre,fra,fr.* par défaut]',
-    'mediasublangcode': 'fr,fre,fra,fr.*',
-    'mediastartfrom': 'position temporelle de démarrage ou durée d\'affichage au format H:MM:SS [début/indéfinie par défaut]',
-    'slideshowduration': 'durée d\'affichage des images, si mediastrartfrom non défini, au format H:MM:SS [aucune par défaut]',
-    'endless': 'lecture en boucle [désactivé par défaut, toujours actif en mode lecture aléatoire de liste]',
-    'verbosity': 'niveau de verbosité de 0 à 2 [0 par défaut]',
-    'stopkey': 'Appuyez sur "S" pour stopper',
-    'auto': 'auto',
-    'sequential': 'séquentiel',
-    'random': 'aléatoire',
-    'remuxkey': 'Appuyez sur "!" et "M" pour alterner entre les modes de remuxage (MP4, MPEGTS, !MP4, !MPEGTS) pour la prochaine session de lecture - mode actuel: %s',
-    'servertypekey': 'Appuyez sur "T" pour alterner entre les types de serveur (auto, séquentiel, aléatoire) pour la prochaine session de lecture - mode actuel: %s',
-    'endlesskey': 'Appuyez sur "E" pour activer/désactiver la lecture en boucle - mode actuel: %s',
-    'enabled': 'activé',
-    'disabled': 'désactivé',
-    'remuxnext': 'Mode de remuxage pour la prochaine session de lecture: %s',
-    'servertypenext': 'Type de serveur pour la prochaine session de lecture: %s',
-    'endlessstatus': 'Lecture en boucle: %s'
-  }
-}
 EN_STRINGS = {
   'mediaprovider': {
     'opening': 'Opening of "%s" recognized as "%s" in "%s" mode - title: %s',
@@ -469,12 +251,6 @@ EN_STRINGS = {
   }
 }
 LSTRINGS = EN_STRINGS
-try:
-  if locale.getlocale()[0][:2].lower() == 'fr':
-    LSTRINGS = FR_STRINGS
-except:
-  pass
-
 
 class log_event:
 
@@ -5132,7 +4908,7 @@ def _seconds_to_position(seconds):
 
 def readFile(fn):
     with open(fn) as f:
-        return f.readlines()
+        return f.read()
 
 
 class DLNAWebInterfaceServer:
@@ -5147,9 +4923,13 @@ class DLNAWebInterfaceServer:
   
   HTML_UPNP_TEMPLATE = readFile("HtmlUpnpTemplate.html")
   HTML_START_TEMPLATE = readFile("HtmlStartTemplate.html")
-  HTML_START_TEMPLATE = HTML_START_TEMPLATE.replace('{', '{{').replace('}', '}}').replace('{{#', '{').replace('#}}', '}').format_map(LSTRINGS['webinterface']).replace('{{', '{').replace('}}', '}')
+  HTML_START_TEMPLATE = HTML_START_TEMPLATE.replace('{', '{{').replace('}', '}}').replace('{{#', '{').replace('#}}', '}')
+  HTML_START_TEMPLATE = HTML_START_TEMPLATE.format_map(LSTRINGS['webinterface'])
+  HTML_START_TEMPLATE = HTML_START_TEMPLATE.replace('{{', '{').replace('}}', '}')
   HTML_CONTROL_TEMPLATE = readFile("HtmlControlTemplate.html")
-  HTML_CONTROL_TEMPLATE = HTML_CONTROL_TEMPLATE.replace('{', '{{').replace('}', '}}').replace('{{#', '{').replace('#}}', '}').format_map(LSTRINGS['webinterface']).replace('{{', '{').replace('}}', '}')
+  HTML_CONTROL_TEMPLATE = HTML_CONTROL_TEMPLATE.replace('{', '{{').replace('}', '}}').replace('{{#', '{').replace('#}}', '}')
+  HTML_CONTROL_TEMPLATE = HTML_CONTROL_TEMPLATE.format_map(LSTRINGS['webinterface'])
+  HTML_CONTROL_TEMPLATE = HTML_CONTROL_TEMPLATE.replace('{{', '{').replace('}}', '}')
 
   def __init__(self, DLNAWebInterfaceServerAddress=None, DLNAJoinIp=None, Launch=INTERFACE_NOT_RUNNING, Renderer_uuid=None, Renderer_name=None, MediaServerMode=None, MediaSrc='', MediaStartFrom='0:00:00', MediaBufferSize=75, MediaBufferAhead=25, MediaMuxContainer=None, OnReadyPlay=False, MediaSubSrc='', MediaSubLang=None, SlideshowDuration=None, EndLess=False, verbosity=0):
     self.verbosity = verbosity
