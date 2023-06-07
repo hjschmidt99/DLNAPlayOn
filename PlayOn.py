@@ -4907,7 +4907,7 @@ def _seconds_to_position(seconds):
   return pos
 
 def readFile(fn):
-    with open(fn) as f:
+    with open(fn, mode="r", encoding="utf-8") as f:
         return f.read()
 
 

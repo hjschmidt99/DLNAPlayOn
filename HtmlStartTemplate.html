@@ -292,6 +292,10 @@
       }
     </script>
     <style type="text/css">
+      * {
+        font-family: Arial;
+        font-size: 12px;
+      }
       table {
         border: 1px solid rgb(0,0,0);
         border-collapse:collapse;
@@ -374,7 +378,7 @@
       <iframe id="upnp_content" src="about:blank" title="navigation UPnP" style="border:none;width:100%;height:80%;" onload="upnp_load()"> </iframe>
     </div>
     <label for="URL-" style="display:##DISPLAY##;">URL :<span id="upnp_but" style="display:none;"><button style="margin-left:5px;margin-right:0px;width:60px;height:30px;padding-left:2px;padding-right:2px;padding-top:0px;padding-bottom:0px;font-size:40%;" onclick="upnp_button()">UPnP &gt;</button></span></label>
-    <textarea id="URL-" name="MediaSrc-" required style="height:110px;resize:none;display:##DISPLAY##; font-size:50%;width:80%">##URL##</textarea>
+    <textarea id="URL-" name="MediaSrc-" required style="height:110px;resize:none;font-size:50%;width:80%;display:##DISPLAY##">##URL##</textarea>
     <br>
     <form method="post" id="form" style="display:##DISPLAY##;">
       <input type="URL" id="URL" name="MediaSrc" value="" style="display:none;" required>
