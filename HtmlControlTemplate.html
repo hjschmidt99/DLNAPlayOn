@@ -141,7 +141,8 @@
         }
       }
       function stop_button() {
-        conf = window.confirm("{#jmstop#}");
+        //conf = window.confirm("{#jmstop#}");
+        conf = true;
         if (conf) {socket.send('Arrêt');}
       }
       function jump() {
@@ -164,32 +165,47 @@
     <style type="text/css">
         * {
           font-family: Arial;
-          font-size: 12px;
         }
+        button {
+            margin-right: 3px;
+            width: 50px;
+        }
+
     </style>
     </head>
-  <body style="background-color:rgb(40,45,50);color:rgb(225,225,225);font-size:32px;">
-    <h1 style="line-height:20px;font-size:180%;">PlayOn&nbsp;&nbsp;&nbsp;&nbsp;{#jcontrol#}<br></h1>
-    <img id="renderer_icon" src="data:;base64,##RENDERERICON##" alt=" " style="height:36px;width:auto;vertical-align:middle;">
-    <span id="renderer_name" style="font-size:130%;">&nbsp;&nbsp;##RENDERERNAME##</span>
-    <br style="line-height:100px;">
-    <select id="playlist" onchange="jump()" style="background-color:rgb(40,45,50);color:rgb(225,225,225);font-size:50%;width:91%;display:none;">
+  <body style="background-color:rgb(40,45,50);color:rgb(225,225,225);">
+    <h2>PlayOn&nbsp;{#jcontrol#}</h2>
+    <span id="renderer_name">##RENDERERNAME##</span>
+    <br>
+    <select id="playlist" onchange="jump()" style="background-color:rgb(40,45,50);color:rgb(225,225,225);width:91%;display:none;">
     <option value="0" disabled hidden>{#jplaylist#}</option>
     </select>&nbsp;<button id="shuffle" style="border:none;vertical-align:middle;display:none;" onclick="shuffle_button()"><svg xmlns="http://www.w3.org/2000/svg" width="15px" height="23px" style="font-size:30px;font-weight:bold;"><text x="-5" y="21" >&nesear;</text></svg></button>
-    <p style="margin-bottom:0px;">{#jurl#} : </p>
-    <p id="media_src" style="margin-left:30px;margin-top:10px;font-size:50%;word-wrap:break-word;height:110px;width:90%;overflow-y:auto;white-space:pre-wrap;">##URL##</p>
-    <p style="line-height:60px;">{#jstatus#} :&nbsp;&nbsp;&nbsp;<span id="status" style="color:rgb(200,250,240);">{#jinitialization#}</span></p>
-    <p style="line-height:60px;">{#jplaybackposition#} :&nbsp;&nbsp;&nbsp;<span id="position" style="color:rgb(200,250,240);">-</span></p>
+    <p >{#jurl#} : </p>
+    <p id="media_src" >##URL##</p>
+    <p >{#jstatus#} :&nbsp;&nbsp;&nbsp;<span id="status" >{#jinitialization#}</span></p>
+    <p >{#jplaybackposition#} :&nbsp;&nbsp;&nbsp;<span id="position">-</span></p>
     <br>
-    <button id="play-pause" style="background-color:rgb(200,250,240);border:none;padding-top:20px;padding-bottom:20px;margin-left:50px;margin-right:75px;width:200px;font-size:100%;font-weight:bold;cursor:pointer;" onclick="play_pause_button()">{#jplay#}</button>
-    <button id="stop" style="background-color:rgb(250,220,200);border:none;padding-top:20px;padding-bottom:20px;margin-left:75px;margin-right:150px;width:200px;font-size:100%;font-weight:bold;cursor:pointer;" onclick="stop_button()">{#jstop#}</button>
-    <span id="mute" style="color:red;word-spacing:-30px;cursor:pointer;display:none;" onclick="mute_button()">🔈 <strong style="visibility:hidden;">&setmn;</strong></span>&nbsp;<input type="range" min="0" max="100" value="100" id="volume" style="width:100px;cursor:pointer;display:none;" onchange="volume_range()">
+    <div style="display: flex; align-items: center;">
+    <button id="play-pause" onclick="play_pause_button()">{#jplay#}</button>
+    <button id="stop" onclick="stop_button()">{#jstop#}</button>
+    &nbsp;&nbsp;&nbsp;
+    <button onclick="relseek(-600)">-10</button>
+    <button onclick="relseek(-300)">-5</button>
+    <button onclick="relseek(-60)">-1</button>
+    <button onclick="relseek(60)">+1</button>
+    <button onclick="relseek(300)">+5</button>
+    <button onclick="relseek(600)">+10</button>
+    &nbsp;&nbsp;&nbsp;
+    <span id="mute" style="color:red;word-spacing:-30px;cursor:pointer;display:none;" onclick="mute_button()">🔈 
+        <strong style="visibility:hidden;">&setmn;</strong></span>&nbsp;
+    <input type="range" min="0" max="100" value="100" id="volume" style="width:100px;cursor:pointer;display:none;" onchange="volume_range()">
+    </div>
     <br>
-    <br>
-    <input type="range" min="0" max="10000" value="0" id="seekbar" style="margin-left:50px;margin-right:50px;width:80%;cursor:pointer;display:none;">
-    <p id="seektarget" style="margin-left:50px;font-size:75%;display:none;"> {#jtargetposition#} : <span id="seekposition">0:00:00</span> / <span id="seekduration">0:00:00</span></p>
-    <label for="StartFrom" id="lStartFrom" style="margin-left:50px;font-size:75%;display:none;">{#jtargetposition#} :</label>
-    <input type="time" id="StartFrom" step="1" value="00:00:00" style="height:40px;font-size:70%;border: none;background-color:rgb(30,30,35);color:rgb(200,250,240);display:none;">
+    <input type="range" min="0" max="10000" value="0" id="seekbar" style="margin-left:5px;margin-right:5px;width:90%;cursor:pointer;display:none;">
+    <p id="seektarget" style="margin-left:50px;display:none;"> {#jtargetposition#} : <span id="seekposition">0:00:00</span> / <span id="seekduration">0:00:00</span></p>
+    <label for="StartFrom" id="lStartFrom" style="margin-left:5px;display:none;">{#jtargetposition#} :</label>
+    <input type="time" id="StartFrom" step="1" value="00:00:00" style="display:none;">
+    <span id="txta" style="display:none;"></span>
     <script>
       new_socket();
       seekbar = document.getElementById("seekbar");
@@ -203,8 +219,21 @@
         seekposition.innerHTML = seekposition_d.toISOString().substr(12, 7);
       }
       seekbar.onchange = function() {
-        if (document.getElementById("status").innerHTML != "initialisation") {socket.send("Seek:" + seekposition.innerHTML);}
+        if (document.getElementById("status").innerHTML != "initialisation") {
+            txta.innerHTML = "Seek:" + seekposition.innerHTML;
+            socket.send("Seek:" + seekposition.innerHTML);
+        }
         seekbar.blur();
+      }
+      function relseek(secs) {
+        if (document.getElementById("status").innerHTML != "initialization") {
+            let act = seekposition.innerHTML;
+            let d0 = Date.parse("1970-01-01T0" + act + "Z");
+            let d1 = new Date(d0 + secs * 1000);
+            seekposition.innerHTML = d1.toISOString().substr(12, 7);
+            txta.innerHTML = "Seek:" + seekposition.innerHTML;
+            socket.send("Seek:" + seekposition.innerHTML);
+        }
       }
       playlist = document.getElementById("playlist");
       playlist.selectedIndex = 0;
