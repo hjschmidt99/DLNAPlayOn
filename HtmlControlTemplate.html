@@ -189,6 +189,9 @@
     <button id="play-pause" onclick="play_pause_button()">{#jplay#}</button>
     <button id="stop" onclick="stop_button()">{#jstop#}</button>
     &nbsp;&nbsp;&nbsp;
+    <button onclick="playNext(-1)">prev</button>
+    <button onclick="playNext(1)">next</button>
+    &nbsp;&nbsp;&nbsp;
     <button onclick="relseek(-600)">-10</button>
     <button onclick="relseek(-300)">-5</button>
     <button onclick="relseek(-60)">-1</button>
@@ -233,6 +236,17 @@
             seekposition.innerHTML = d1.toISOString().substr(12, 7);
             txta.innerHTML = "Seek:" + seekposition.innerHTML;
             socket.send("Seek:" + seekposition.innerHTML);
+        }
+      }
+      function playNext(d) {
+        if (document.getElementById("status").innerHTML != "initialization") {
+          if (playlist.options.length > 1) {
+            let next = playlist.selectedIndex + d;
+            if (next < 1) {next = 1;}
+            if (next >= playlist.options.length) {next = playlist.options.length - 1;}
+            playlist.selectedIndex = next;
+            jump();
+          }
         }
       }
       playlist = document.getElementById("playlist");
