@@ -115,7 +115,7 @@
           n_cell = n_row.insertCell();
           n_cell.id = "renderer_ip";
           n_cell.innerHTML = renderer_ip;
-          n_cell.style.fontSize="70%";
+          //n_cell.style.fontSize="70%";
           if (renderer_status == "True") {
             n_row.style.display = "table-row";
           } else {
@@ -268,9 +268,9 @@
         let bc = "";
         for (let i=0; i<upnp_hist.length; i++) {
           if (i == 0 && upnp_hist.length==1) {
-            bc = "<a class=\"refresh\" style=\"font-size:200%;line-height:100%;\" href=\"javascript:open_link('" + encodeURIComponent(upnp_hist[0][0]+ ";refresh") + "')\">&capand;</a>&nbsp;&sc;&nbsp;";
+            bc = "<a class=\"refresh\" style=\"line-height:100%;\" href=\"javascript:open_link('" + encodeURIComponent(upnp_hist[0][0]+ ";refresh") + "')\">&capand;</a>&nbsp;&sc;&nbsp;";
           } else if (i == 0) {
-            bc = "<a style=\"font-size:200%;line-height:100%;\" href=\"javascript:open_link('" + encodeURIComponent(upnp_hist[0][0]) + "')\">&capand;</a>&nbsp;&sc;&nbsp;";
+            bc = "<a style=\"line-height:100%;\" href=\"javascript:open_link('" + encodeURIComponent(upnp_hist[0][0]) + "')\">&capand;</a>&nbsp;&sc;&nbsp;";
           } else if (i < upnp_hist.length -1) {
             bc = bc + "<a href=\"javascript:open_link('" + encodeURIComponent(upnp_hist[i][0]) + "')\">" + upnp_hist[i][1] + "</a>&nbsp;&sc;&nbsp;";
           } else {
@@ -292,9 +292,12 @@
       }
     </script>
     <style type="text/css">
+      button {
+            margin-right: 3px;
+            width: 50px;
+        }
       * {
         font-family: Arial;
-        font-size: 12px;
       }
       table {
         border: 1px solid rgb(0,0,0);
@@ -326,7 +329,7 @@
       label {
         vertical-align:middle;
       }
-      button {
+      button1 {
         vertical-align:middle;
         border:none;
         padding-top:20px;
@@ -371,25 +374,27 @@
       }
     </style>
   </head>
-  <body style="background-color:rgb(40,45,50);color:rgb(225,225,225);font-size:32px;">
-    <h1 style="line-height:20px;font-size:180%;">PlayOn&nbsp;&nbsp;&nbsp;&nbsp;{#jstart#}<br></h1>
+  <body style="background-color:rgb(40,45,50);color:rgb(225,225,225);">
+    <h2>PlayOn&nbsp;{#jstart#}</h2>
     <div id="upnp_nav" class="modal">
-      <span id="upnp_back" style="cursor:pointer;margin-left:10px;" onclick="upnp_back()">&larr;</span>&nbsp;&nbsp;<span id="upnp_validate" style="color:rgb(5,60,50);">&check;</span>&nbsp;&nbsp;<span id="upnp_cancel" style="cursor:pointer;color:rgb(250,220,200);" onclick="upnp_cancel()">&cross;</span>&nbsp;&nbsp;<div id="upnp_loading" style="color:rgb(40,45,50);animation-duration:1s;animation-iteration-count:infinite;animation-timing-function:linear;display:inline-block">&orarr;</div>&nbsp;&nbsp;<div id="upnp_bc" style="font-size:20px;display:inline-block"></div>
+      <span id="upnp_back" style="cursor:pointer;margin-left:10px;" onclick="upnp_back()">&larr;</span>&nbsp;&nbsp;<span id="upnp_validate" style="color:rgb(5,60,50);">&check;</span>&nbsp;&nbsp;<span id="upnp_cancel" style="cursor:pointer;color:rgb(250,220,200);" onclick="upnp_cancel()">&cross;</span>&nbsp;&nbsp;<div id="upnp_loading" style="color:rgb(40,45,50);animation-duration:1s;animation-iteration-count:infinite;animation-timing-function:linear;display:inline-block">&orarr;</div>&nbsp;&nbsp;<div id="upnp_bc" style="display:inline-block"></div>
       <iframe id="upnp_content" src="about:blank" title="navigation UPnP" style="border:none;width:100%;height:80%;" onload="upnp_load()"> </iframe>
     </div>
-    <label for="URL-" style="display:##DISPLAY##;">URL :<span id="upnp_but" style="display:none;"><button style="margin-left:5px;margin-right:0px;width:60px;height:30px;padding-left:2px;padding-right:2px;padding-top:0px;padding-bottom:0px;font-size:40%;" onclick="upnp_button()">UPnP &gt;</button></span></label>
-    <textarea id="URL-" name="MediaSrc-" required style="height:110px;resize:none;font-size:50%;width:80%;display:##DISPLAY##">##URL##</textarea>
+    <label for="URL-" style="display:##DISPLAY##;">URL :<span id="upnp_but" style="display:none;"><button onclick="upnp_button()">UPnP &gt;</button></span></label>
+    <textarea id="URL-" name="MediaSrc-" required style="height:110px;resize:none;width:80%;display:##DISPLAY##">##URL##</textarea>
     <br>
     <form method="post" id="form" style="display:##DISPLAY##;">
       <input type="URL" id="URL" name="MediaSrc" value="" style="display:none;" required>
       <input type="URL" id="SUBURL" name="MediaSubSrc" value="" style="display:none;">
       <br>
       <label for="StartFrom">{#jplaybackposition#} :</label>
-      <input type="time" id="StartFrom" name="MediaStartFrom" step="1" value="0##STARTFROM##" style="height:50px;font-size:70%;">
+      <input type="time" id="StartFrom" name="MediaStartFrom" step="1" value="0##STARTFROM##">
       <input type="hidden" id="Renderer" name="RendererInd" value="" required>
     </form>
-    <button id="play" style="background-color:rgb(200,250,240);" onclick="play_button()">{#jgoplay#}</button>
-    <button id="reset" style="background-color:rgb(250,220,200);" onclick="reset_button()">{#jreset#}</button>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <br><br>
+    <button id="play" onclick="play_button()">{#jgoplay#}</button>
+    <button id="reset" onclick="reset_button()">{#jreset#}</button>
     <br><br>
     <table id="Renderers" style="display:none;">
       <colgroup>
