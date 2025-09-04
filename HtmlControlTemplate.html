@@ -161,6 +161,11 @@
       function volume_range() {
         socket.send("Volume:" + document.getElementById("volume").value.toString());
       }
+      function volumeInc(d) {
+        let v = parseInt(document.getElementById("volume").value,10) + d;
+        if (v < 0) {v = 0;}
+        socket.send("Volume:" + v.toString());
+      }
     </script>
     <style type="text/css">
         * {
@@ -202,10 +207,13 @@
     <span id="mute" style="color:red;word-spacing:-30px;cursor:pointer;display:none;" onclick="mute_button()">🔈 
         <strong style="visibility:hidden;">&setmn;</strong></span>&nbsp;
     <input type="range" min="0" max="100" value="100" id="volume" style="width:100px;cursor:pointer;display:none;" onchange="volume_range()">
+    &nbsp;&nbsp;&nbsp;
+    <button onclick="volumeInc(-1)">-</button>
+    <button onclick="volumeInc(1)">+</button>
     </div>
     <br>
     <input type="range" min="0" max="10000" value="0" id="seekbar" style="margin-left:5px;margin-right:5px;width:90%;cursor:pointer;display:none;">
-    <p id="seektarget" style="margin-left:50px;display:none;"> {#jtargetposition#} : <span id="seekposition">0:00:00</span> / <span id="seekduration">0:00:00</span></p>
+    <p id="seektarget" style="margin-left:5px;display:none;"> {#jtargetposition#} : <span id="seekposition">0:00:00</span> / <span id="seekduration">0:00:00</span></p>
     <label for="StartFrom" id="lStartFrom" style="margin-left:5px;display:none;">{#jtargetposition#} :</label>
     <input type="time" id="StartFrom" step="1" value="00:00:00" style="display:none;">
     <span id="txta" style="display:none;"></span>
