@@ -111,10 +111,11 @@
               if (event.data.substring(5) == "true") {
                 document.getElementById("mute").innerHTML = "🔈 <strong style='visibility:visible;'>&setmn;</strong>";
               } else {
-               document.getElementById("mute").innerHTML = "🔈 <strong style='visibility:hidden;'>&setmn;</strong>";
+                document.getElementById("mute").innerHTML = "🔈 <strong style='visibility:hidden;'>&setmn;</strong>";
               }
           } else if (event.data.substring(0,6) == "Volume") {
-              document.getElementById("volume").value = parseInt(event.data.substring(7),10);
+            document.getElementById("volume_value").innerHTML = event.data.substring(7);
+            document.getElementById("volume").value = parseInt(event.data.substring(7),10);
           } else if (event.data != "close") {
             document.getElementById("position").innerHTML = event.data;
             if (duration != 0 && !seekongoing ) {
@@ -209,6 +210,7 @@
     <input type="range" min="0" max="100" value="100" id="volume" style="width:100px;cursor:pointer;display:none;" onchange="volume_range()">
     &nbsp;&nbsp;&nbsp;
     <button onclick="volumeInc(-1)">-</button>
+    <span id="volume_value" style="width:30px;text-align:center;"></span>
     <button onclick="volumeInc(1)">+</button>
     </div>
     <br>
