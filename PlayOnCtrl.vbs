@@ -20,8 +20,12 @@ end if
 wscript.sleep 1000
 
 tv = "[TV] Samsung 5 Series (40)"
+intf = "192.168.0.124"
 WorkDir = Left(WScript.ScriptFullName, InStrRev(WScript.ScriptFullName, "\"))
 sh.CurrentDirectory  = WorkDir
-cmd = "python.exe PlayOn.py c -n """ & tv & """ -o """ & x & """"
+cmd = "python.exe PlayOn.py c -v 2 "
+cmd = cmd & " -n """ & tv & """"
+cmd = cmd & " -j """ & intf & """"
+cmd = cmd & " -o """ & x & """"
 'msgbox cmd
 sh.run cmd, 2
