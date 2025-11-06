@@ -27,7 +27,8 @@ if __name__ == "__main__":
         intf = s.getsockname()[0]
         s.close()
 
-        cmd = f'python.exe PlayOn.py c -v 2  -n "{tv}" -j "{intf}" -o "{fname}"'
+        # start minimized
+        cmd = f'cmd.exe /c start /min python.exe PlayOn.py c -v 2  -n "{tv}" -j "{intf}" -o "{fname}"'
         print(cmd)
         subprocess.Popen(cmd)
     except:
