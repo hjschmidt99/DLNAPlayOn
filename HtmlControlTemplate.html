@@ -167,6 +167,34 @@
         if (v < 0) {v = 0;}
         socket.send("Volume:" + v.toString());
       }
+      
+      window.addEventListener("keydown", (event) => {
+        console.log(event.key);
+        switch (event.key) {
+            case "PageUü":
+                playNext(-1);
+                break;
+            case "PageDown":
+                playNext(1);
+                break;
+            case "ArrowLeft":
+                relseek(-20);
+                break;
+            case "Clear":
+                relseek(60);
+                break;
+            case "ArrowRight":
+                relseek(20);
+                break;
+            case " ":
+                play_pause_button()
+                break;
+            default:
+                return; 
+        }
+        event.preventDefault();
+      })
+        
     </script>
     <style type="text/css">
         * {
