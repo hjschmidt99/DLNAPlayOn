@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "Python: Aktuelle Datei",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "args": [],
@@ -14,10 +14,25 @@
         },
         {
             "name": "Python: main",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "PlayOn.py",
             "args": ["s"],
+            "console": "integratedTerminal",
+            "env": {
+                "debugSession": "1",
+            }
+        },
+        {
+            "name": "Python: main args",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "PlayOn.py",
+            "args": ["c",  "-v",  "2",
+                "-p", "8000", 
+                "-n", "[TV] Samsung 5 Series (40)", 
+                "-j", "192.168.0.124", 
+                "-o", "D:\\dev\\DLNAPlayOn\\PlayOnCtrl.py.m3u8"],
             "console": "integratedTerminal",
             "env": {
                 "debugSession": "1",
