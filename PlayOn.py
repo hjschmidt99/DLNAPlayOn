@@ -520,7 +520,6 @@ class MediaProvider(threading.Thread):
     if not mimetypes.inited:
       mimetypes.init()
     is_stop = lambda : False if stop is None else stop.is_set()
-
     sh_str = lambda s: s if len(s) <= cls.TITLE_MAX_LENGTH else s[:cls.TITLE_MAX_LENGTH] + '…'
     playlist = False
     titles = []
