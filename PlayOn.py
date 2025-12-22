@@ -2134,7 +2134,7 @@ class HTTPMessage:
         if body_pos + body_len - len(msg) <= rem_length:
           message.sendall('HTTP/1.1 100 Continue\r\n\r\n'.encode('ISO-8859-1'))
         else:
-          message.sendall(('HTTP/1.1 413 Payload too large\r\nContent-Length: 0\r\nDate: %s\r\nCache-Control: no-cache, no-store, must-revalidate\r\n\r\n' % email.utils.formatdate(time.time(), usegmt=True)).encode('ISO-8859-1'))
+          message.sendall(('HTTP/1.1 413 Payload too large\r\nContent-Length: 0\r\nDate: %s\r\nCache-Control: no-cache, no-store, must-revalidate\r\n\r\n' % time.time()).encode('ISO-8859-1'))
           return http_message.clear()
       except:
         return http_message.clear()
