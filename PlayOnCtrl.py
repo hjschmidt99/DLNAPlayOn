@@ -44,11 +44,14 @@ if __name__ == "__main__":
         # write playlist
         fname = pyscript + ".m3u8"
         with open(fname, 'a' if running else 'w', encoding="utf-8") as f:
+            if not running:
+                f.write("#EXTM3U\n")
             f.write("\n".join(argv[1:]) + "\n")
 
         if not running:
             # start minimized
-            cmd = f'cmd.exe /c start /min python.exe PlayOn.py c -v 2 -p {port} -n "{tv}" -j "{ip}" -o "{fname}"'
+            #cmd = f'cmd.exe /c start /min python.exe PlayOn.py c -v 2 -p {port} -t s -n "{tv}" -j "{ip}" -o "{fname}"'
+            cmd = f'cmd.exe /c start /min python.exe PlayOn.py c -v 0 -p {port} -n "{tv}" -j "{ip}" -o "{fname}"'
             print(cmd)
             subprocess.Popen(cmd)
 
