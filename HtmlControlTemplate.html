@@ -171,7 +171,7 @@
       window.addEventListener("keydown", (event) => {
         console.log(event.key);
         switch (event.key) {
-            case "PageUü":
+            case "PageUp":
                 playNext(-1);
                 break;
             case "PageDown":
@@ -185,6 +185,18 @@
                 break;
             case "ArrowRight":
                 relseek(20);
+                break;
+            case "End":
+                relseek(300);
+                break;
+            case "Home":
+                relseek(-300);
+                break;
+            case "ArrowUp":
+                volumeInc(1);
+                break;
+            case "ArrowDown":
+                volumeInc(-1);
                 break;
             case " ":
                 play_pause_button()
