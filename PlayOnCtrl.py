@@ -51,7 +51,7 @@ if __name__ == "__main__":
         if not running:
             # start minimized
             #cmd = f'cmd.exe /c start /min python.exe PlayOn.py c -v 2 -p {port} -t s -n "{tv}" -j "{ip}" -o "{fname}"'
-            cmd = f'cmd.exe /c start /min python.exe PlayOn.py c -v 0 -p {port} -n "{tv}" -j "{ip}" -o "{fname}"'
+            cmd = f'cmd.exe /c start /min python.exe PlayOn.py c -v 2 -p {port} -n "{tv}" -j "{ip}" -o "{fname}"'
             print(cmd)
             subprocess.Popen(cmd)
 
