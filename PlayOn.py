@@ -252,6 +252,7 @@ EN_STRINGS = {
   }
 }
 LSTRINGS = EN_STRINGS
+LSTRINGS['webinterface']["workdir"] = os.path.dirname(os.path.abspath(__file__)).replace('\\', '/') + '/'
 
 class log_event:
 
